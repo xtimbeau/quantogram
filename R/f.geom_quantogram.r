@@ -16,7 +16,7 @@
 #' @return une "layer" pour ggplot
 #' @export
 #'
-#' @import ggplot2 dplyr rlang data.table vctrs
+#' @import ggplot2
 
 geom_quantogram <- function(mapping = NULL, data = NULL,
                             stat = StatQuanto, position = "identity",
@@ -318,22 +318,20 @@ StatQuanto <- ggplot2::ggproto(
 #'
 #' @import data.table
 #'
-#'
 compute_quansity_dt <- function(x, y, dx, prob, trans, labels_x, delta_x) {
-  require(data.table, quietly=TRUE)
-  # if(trans)
+   # if(trans)
   #   dx <- rep(sum(dx)/length(dx), length(dx))
   # data <- data.table(x = x, y = y, dx = dx)
   data <- data.table(x = x, y = y, dx = dx)
   data <- merge(data, data.table(x=labels_x, dx=delta_x),
                 by=c("x", "dx"),
                 all.x=TRUE, all.y=TRUE, sort=TRUE)
-  data[is.na(y), y:=0]
+  data[is.na(y), `:=`(y=0)]
   if(trans)
     ydx <- mean(data$dx)
   else
     ydx <- data$dx
-  data[, ydx := (ydx)]
+  data[, `:=`(ydx=(ydx))]
 
   quansity1 <- data[,.(median= median(y),
                        mean = mean(y),
@@ -348,9 +346,9 @@ compute_quansity_dt <- function(x, y, dx, prob, trans, labels_x, delta_x) {
       q_p = quantile(x = y, probs = c(0.5 + .x / 2))
     ), by=x]
     setnames(qq, c("q_p", "q_m"), c(qp, qm))
-    qq[, x:=NULL]})
+    qq[, `:=`(x=NULL)]})
   quansities <- do.call(cbind, quansities)
-  if(length(prob)>0) quansities[, ':='(ymax=do.call(pmax,.SD), ymin=do.call(pmin,.SD))]
+  if(length(prob)>0) quansities[, `:=`(ymax=do.call(pmax,.SD), ymin=do.call(pmin,.SD))]
   tibble::as_tibble(cbind(quansity1, quansities))
 }
 

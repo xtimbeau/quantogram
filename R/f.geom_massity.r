@@ -15,7 +15,7 @@
 #'
 #' @return une "layer" pour ggplot
 #' @export
-#' @import ggplot2 dplyr rlang data.table vctrs
+#' @import ggplot2
 #'
 geom_massity <- function(mapping = NULL, data = NULL,
                          stat = "massity", position = "identity",
@@ -98,8 +98,6 @@ stat_massity <- function(mapping = NULL, data = NULL,
 #' @rdname geom_massity
 #' @format NULL
 #' @usage NULL
-#' @importFrom ggplot2 ggproto has_flipped_aes after_stat flip_data
-#' @importFrom plyr defaults
 #' @export
 StatMassity <- ggplot2::ggproto("StatMassity", ggplot2::Stat,
                        required_aes = "x|y",
@@ -141,7 +139,6 @@ StatMassity <- ggplot2::ggproto("StatMassity", ggplot2::Stat,
 
 # compute massity -------------------
 # fonction qui calcule les densités, utilisée dans StatMassity
-#' @importFrom vctrs new_data_frame
 
 compute_massity <- function(x, m, from, to, bw = "nrd0", adjust = 1,
                             kernel = "gaussian", n = 512) {

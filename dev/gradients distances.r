@@ -238,7 +238,7 @@ ggsave(plot=gggg, ".svg/comp distance dprix 2019 10.svg", width=25, height = 17,
 ggsave(plot=gp, ".svg/dist275 dprix par an.svg", width=25, height = 17, units="cm")
 ggsave(plot=gp2, ".svg/t2emp17_100k dprix par an.svg", width=25, height = 17, units="cm")
 
-gp <- ggplot(dv3f)+geom_quantogram(aes(x=dist275,  mass=exp(lvm), col=date_ma), cuts = dbrk_surf(100), lines=FALSE, probs=c(0.5), show.legend = FALSE, trans=TRUE)+
+gp <- ggplot(dv3f)+geom_quantogram(aes(x=dist275,  mass=exp(log_prix), col=date_ma), cuts = dbrk_surf(100), lines=FALSE, probs=c(0.5), show.legend = FALSE, trans=TRUE)+
   scale_y_continuous(labels=f2si2)+
   ylab("price per m²")+
   xlab("Centiles of ground surface per distance to Notre Dame")+

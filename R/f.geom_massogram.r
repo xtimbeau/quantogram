@@ -16,7 +16,7 @@
 #' @return une "layer" pour ggplot
 #' @export
 #'
-#' @import ggplot2 dplyr rlang data.table vctrs
+#' @import ggplot2
 #'
 
 geom_massogram <- function(mapping = NULL, data = NULL,
@@ -233,27 +233,27 @@ StatMasso <- ggplot2::ggproto(
 
 #'
 #' @import data.table
-#'
 
 compute_masso <- function(x, y, dx, ggm, trans=FALSE, labels_x, delta_x) {
-  require(data.table, quietly=TRUE)
   data <- data.table(x = x, y = y, dx = dx)
   data <- merge(data,
                 data.table(x=labels_x, dx=delta_x),
                 by=c("x", "dx"), all.x=TRUE, all.y=TRUE, sort=TRUE)
-  data[is.na(y), y:=0]
+  data[is.na(y), `:=`(y=0)]
+
   if(trans)
     ydx <- mean(data$dx)
   else
     ydx <- data$dx
-  data[, ydx := (ydx)]
+  data[, `:=`(ydx = (ydx))]
 
   quansity1 <- data[,.(sum_gross = sum(y),
                        mass = sum(y),
                        dx=first(dx),
                        ydx=first(ydx)), by=x]
   setorder(quansity1, x)
-  quansity1[, sum := sum_gross/ydx][, cumsum := cumsum(sum_gross)]
-  quansity1[, `:=`(ymax=sum, ymin=0, groupmass = sum(sum_gross), grossgroupmass = ggm[[1]])]
+  quansity1[, `:=`(sum = sum_gross/ydx)][, `:=`(cumsum = cumsum(sum_gross))]
+  quansity1[, `:=`(ymax = sum, ymin=0, groupmass = sum(sum_gross), grossgroupmass = ggm[[1]])]
   tibble::as_tibble(quansity1)
+
 }
