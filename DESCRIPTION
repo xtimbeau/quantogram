@@ -1,0 +1,22 @@
+Package: quantogram
+Type: Package
+Title: geoms extending ggplot2 for special density and histogram plots
+Version: 0.1.0
+Author: Xavier Timbeau
+Maintainer: X. Timbeau <xavier.timbeau@sciencespo.fr>
+Description: Extend density and histogram to calculate mass (non normalized y's)
+    and to bin x according to quantiles.
+    Plus possibly transforming x scale on quantiles to garantee surface = mass.
+License: CECILL-B
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Imports:
+ dplyr,
+ plyr,
+ ggplot2,
+ rlang,
+ data.table,
+ vctrs
+Depends: 
+    R (>= 2.10)
