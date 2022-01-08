@@ -151,7 +151,7 @@ trans_cuts <- function(cuts)
     "qtrans",
     approxfun(y=icuts, x=cuts),
     approxfun(x=icuts, y=cuts),
-    breaks = extended_breaks(),
+    breaks = scales::extended_breaks(),
     minor_breaks = regular_minor_breaks(),
     format = scales::format_format(),
     domain = c(min(cuts), max(cuts)))
