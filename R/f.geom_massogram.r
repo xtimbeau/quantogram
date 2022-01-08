@@ -82,7 +82,7 @@ geom_massogram <- function(mapping = NULL, data = NULL,
 #' @export
 GeomMassogram <- ggplot2::ggproto(
   "GeomMassogram",
-  ggplot2::GeomArea,
+  ggplot2::Geom,
   setup_params = function(data, params) {
     params
   },
@@ -108,6 +108,7 @@ GeomMassogram <- ggplot2::ggproto(
       rects <- data |>
         dplyr::transmute(colour=NA, xmin=x-dx/2, xmax=x+dx/2,
                   ymin = ymin, ymax = y, PANEL, group, fill, size, linetype, alpha)
+
       ll <- grid::gList(
         ggplot2::ggproto_parent(GeomRect, self)$draw_panel(rects, panel_params, coord),
         ggplot2::ggproto_parent(GeomSegment, self)$draw_panel(line, panel_params, coord))
@@ -117,11 +118,11 @@ GeomMassogram <- ggplot2::ggproto(
 
   draw_key = ggplot2::draw_key_polygon,
   required_aes = c("x", "mass"),
-  optional_aes = c("label", "w", "xend", "yend", "xmin", "xmax", "ymin", "ymax"),
-  default_aes = plyr::defaults(
-    ggplot2::aes( fill = NA, colour = "black", alpha = NA, size = 0.5),
-    ggplot2::GeomArea$default_aes)
-)
+  optional_aes = c("label", "w", "y", "xend", "yend", "xmin", "xmax", "ymin", "ymax"),
+  default_aes = ggplot2::aes(
+      y = ggplot2::afterstat(sum),
+      fill = NA, colour = "black", alpha = NA, size = 0.5, linetype = 1)
+  )
 
 #' @rdname geom_massogram
 #' @format NULL
@@ -129,7 +130,7 @@ GeomMassogram <- ggplot2::ggproto(
 #'
 #' @export
 stat_massogram <- function(mapping = NULL, data = NULL,
-                            geom = "area",
+                            geom = "geom_massogram",
                             position = "identity",
                             ...,
                             na.rm = FALSE,
@@ -253,7 +254,6 @@ compute_masso <- function(x, y, dx, ggm, trans=FALSE, labels_x, delta_x) {
                        ydx=first(ydx)), by=x]
   setorder(quansity1, x)
   quansity1[, `:=`(sum = sum_gross/ydx)][, `:=`(cumsum = cumsum(sum_gross))]
-  quansity1[, `:=`(ymax = sum, ymin=0, groupmass = sum(sum_gross), grossgroupmass = ggm[[1]])]
-  tibble::as_tibble(quansity1)
-
+  quansity1[, `:=`(ymax = pmax(sum, 0), ymin=pmin(0, sum), groupmass = sum(sum_gross), grossgroupmass = ggm[[1]])]
+  return(as.data.frame(quansity1))
 }
