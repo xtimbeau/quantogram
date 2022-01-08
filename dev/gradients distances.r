@@ -152,7 +152,7 @@ trans_cuts <- function(cuts)
     approxfun(y=icuts, x=cuts),
     approxfun(x=icuts, y=cuts),
     breaks = scales::extended_breaks(),
-    minor_breaks = regular_minor_breaks(),
+    minor_breaks = scales::regular_minor_breaks(),
     format = scales::format_format(),
     domain = c(min(cuts), max(cuts)))
 }

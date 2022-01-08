@@ -43,7 +43,7 @@ geom_massogram <- function(mapping = NULL, data = NULL,
         approxfun(y=icuts, x=fcuts, rule=2),
         approxfun(x=icuts, y=fcuts, rule=2),
         breaks = scales::extended_breaks(),
-        minor_breaks = regular_minor_breaks(),
+        minor_breaks = scales::regular_minor_breaks(),
         format = scales::format_format(),
         domain = c(min(fcuts), max(fcuts)))
     }
