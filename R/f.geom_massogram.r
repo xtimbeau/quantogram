@@ -21,7 +21,7 @@
 
 geom_massogram <- function(mapping = NULL, data = NULL,
                             stat = StatMasso,
-                            position = "stack",
+                            position = "identity",
                             ...,
                             na.rm = FALSE,
                             cuts = NULL,
@@ -93,7 +93,9 @@ GeomMassogram <- ggplot2::ggproto(
     if (lines)
     {
       line <- data |>
-        dplyr::transmute(colour, x, y, ymin=ymin, ymax=y, PANEL, group, fill, size, linetype, alpha)
+        dplyr::transmute(colour, x, y,
+                         ymin = pmin(y, 0), ymax = pmax(y, 0),
+                         PANEL, group, fill, size, linetype, alpha)
       ll <- ggplot2::GeomArea$draw_panel(line, panel_params, coord)
     }
     else
@@ -107,7 +109,8 @@ GeomMassogram <- ggplot2::ggproto(
 
       rects <- data |>
         dplyr::transmute(colour=NA, xmin=x-dx/2, xmax=x+dx/2,
-                  ymin = ymin, ymax = y, PANEL, group, fill, size, linetype, alpha)
+                  ymin = pmin(y, 0), ymax = pmax(y, 0),
+                  PANEL, group, fill, size, linetype, alpha)
 
       ll <- grid::gList(
         ggplot2::ggproto_parent(GeomRect, self)$draw_panel(rects, panel_params, coord),
@@ -118,9 +121,8 @@ GeomMassogram <- ggplot2::ggproto(
 
   draw_key = ggplot2::draw_key_polygon,
   required_aes = c("x", "mass"),
-  optional_aes = c("label", "w", "y", "xend", "yend", "xmin", "xmax", "ymin", "ymax"),
+  optional_aes = c("label", "w", "y"),
   default_aes = ggplot2::aes(
-      y = ggplot2::afterstat(sum),
       fill = NA, colour = "black", alpha = NA, size = 0.5, linetype = 1)
   )
 
@@ -169,7 +171,7 @@ StatMasso <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = c("x", "mass"),
   default_aes = ggplot2::aes(y = ggplot2::after_stat(sum), fill = NA, w = 1, alpha = NA, colour = NA, size = 0.5),
-  optional_aes = c("label", "ymin", "ymax", "w"),
+  optional_aes = c("label", "w"),
 
   setup_params = function(self, data, params) {
     has_x <- !(is.null(data$x) && is.null(params$x))
@@ -254,6 +256,6 @@ compute_masso <- function(x, y, dx, ggm, trans=FALSE, labels_x, delta_x) {
                        ydx=first(ydx)), by=x]
   setorder(quansity1, x)
   quansity1[, `:=`(sum = sum_gross/ydx)][, `:=`(cumsum = cumsum(sum_gross))]
-  quansity1[, `:=`(ymax = pmax(sum, 0), ymin=pmin(0, sum), groupmass = sum(sum_gross), grossgroupmass = ggm[[1]])]
+  quansity1[, `:=`(groupmass = sum(sum_gross), grossgroupmass = ggm[[1]])]
   return(as.data.frame(quansity1))
 }

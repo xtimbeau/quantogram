@@ -112,31 +112,31 @@ GeomQuantogram <- ggplot2::ggproto(
     if(se){
       if (lines) {
         ribbons <- purrr::map2(probs, alphas, ~ data |>
-                          dplyr::transmute(x,
-                                    PANEL,
-                                    group,
-                                    y = median,
-                                    ymin = .data[[glue::glue("y_{.x}_m")]],
-                                    ymax = .data[[glue::glue("y_{.x}_p")]],
-                                    fill = colour,
-                                    colour = NA,
-                                    linetype,
-                                    size,
-                                    alpha = .y
-                          ))
+                                 dplyr::transmute(x,
+                                                  PANEL,
+                                                  group,
+                                                  y = median,
+                                                  ymin = .data[[glue::glue("y_{.x}_m")]],
+                                                  ymax = .data[[glue::glue("y_{.x}_p")]],
+                                                  fill = colour,
+                                                  colour = NA,
+                                                  linetype,
+                                                  size,
+                                                  alpha = .y
+                                 ))
       } else {
         ribbons <- purrr::map2(probs, alphas, ~ data |>
-                          dplyr::transmute(x,
-                                    PANEL,
-                                    group,
-                                    y = median,
-                                    ymin = .data[[glue::glue("y_{.x}_m")]],
-                                    ymax = .data[[glue::glue("y_{.x}_p")]],
-                                    colour = colour,
-                                    linetype,
-                                    size,
-                                    alpha = .y
-                          ))
+                                 dplyr::transmute(x,
+                                                  PANEL,
+                                                  group,
+                                                  y = median,
+                                                  ymin = .data[[glue::glue("y_{.x}_m")]],
+                                                  ymax = .data[[glue::glue("y_{.x}_p")]],
+                                                  colour = colour,
+                                                  linetype,
+                                                  size,
+                                                  alpha = .y
+                                 ))
       }
     }
     else
@@ -154,11 +154,15 @@ GeomQuantogram <- ggplot2::ggproto(
     rects <- data |>
       dplyr::arrange(x) |>
       dplyr::group_by(PANEL, group) |>
-      dplyr::transmute(colour=NA, xmin=if_else(is.na(lag(x)), x, x-(x-lag(x))/2), xmax=if_else(is.na(lead(x)), x, x+(lead(x)-x)/2),
-                ymin = 0, ymax = y, PANEL, group, fill, size, linetype, alpha) |>
+      dplyr::transmute(
+        colour=NA,
+        xmin=if_else(is.na(lag(x)), x, x-(x-lag(x))/2),
+        xmax=if_else(is.na(lead(x)), x, x+(lead(x)-x)/2),
+        ymin = pmin(0, y), ymax = pmax(0, y),
+        PANEL, group, fill, size, linetype, alpha) |>
       tidyr::drop_na(xmin, xmax) |>
       dplyr::ungroup()
-# browser()
+
     if (lines) {
       ll <- append(
         if (se) purrr::map(ribbons, ~ ggplot2::GeomArea$draw_panel(.x, panel_params, coord)),
@@ -220,7 +224,7 @@ StatQuanto <- ggplot2::ggproto(
   ggplot2::Stat,
   required_aes = c("x", "mass"),
   default_aes = ggplot2::aes(y = ggplot2::after_stat(median),
-                    fill = NA, w = 1, alpha = NA, colour = NA, size = 0.5),
+                             fill = NA, w = 1, alpha = NA, colour = NA, size = 0.5),
   optional_aes = c("label",  "w"),
   non_missing_aes = c("y", "ymin", "ymax"),
   setup_params = function(self, data, params) {
@@ -319,7 +323,7 @@ StatQuanto <- ggplot2::ggproto(
 #' @import data.table
 #'
 compute_quansity_dt <- function(x, y, dx, prob, trans, labels_x, delta_x) {
-   # if(trans)
+  # if(trans)
   #   dx <- rep(sum(dx)/length(dx), length(dx))
   # data <- data.table(x = x, y = y, dx = dx)
   data <- data.table(x = x, y = y, dx = dx)
